@@ -14,14 +14,15 @@ source:
 
 build:
   skip: true  # [win]
+  skip: true  # [linux]
   number: 1
 
 requirements:
   build:
     - python                                 # [build_platform != target_platform]
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    # - {{ compiler('c') }}
+    # - {{ compiler('cxx') }}
     - cmake
     - ninja
   host:
