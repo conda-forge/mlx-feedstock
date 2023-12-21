@@ -43,6 +43,13 @@ jobs:
   timeoutInMinutes: 360
 
   steps:
+  - task: Xcode@5
+    inputs:
+      actions: 'build'
+      sdk: '14.2'
+      xcodeVersion: 'specifyPath'
+      xcodeDeveloperDir: '/Applications/Xcode_15.1.app'
+      packageApp: false
   # TODO: Fast finish on azure pipelines?
   - script: |
       export CI=azure
