@@ -47,6 +47,7 @@ jobs:
     inputs:
       actions: 'build'
       sdk: '14.2'
+      xcWorkspacePath: 
       xcodeVersion: 'specifyPath'
       xcodeDeveloperDir: '/Applications/Xcode_15.1.app'
       packageApp: false
