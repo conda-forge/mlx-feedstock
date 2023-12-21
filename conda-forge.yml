@@ -1,3 +1,8 @@
+azure:
+  settings_osx:
+    pool:
+      # macos-13 is in beta ... but let's try it
+      vmImage: macos-13
 github:
   branch_name: main
   tooling_branch_name: main
