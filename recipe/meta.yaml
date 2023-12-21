@@ -47,7 +47,7 @@ test:
   commands:
     - pip check
     # Tests are passing only if you have more than 8GB of RAM.
-    # - python -m unittest discover python/tests
+    - python -m unittest discover python/tests  # [osx and arm64]
 
 about:
   home: https://github.com/ml-explore/mlx
