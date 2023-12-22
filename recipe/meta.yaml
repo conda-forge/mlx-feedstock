@@ -21,14 +21,15 @@ requirements:
   build:
     - python                                 # [build_platform != target_platform]
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    # - {{ compiler('c') }}
-    # - {{ compiler('cxx') }}
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
     - cmake
     - ninja
   host:
     - python
     - pip
     - pybind11
+    - libcxx
     - blas     # [not (osx and arm64)]
     - libblas  # [not (osx and arm64)]
   run:
