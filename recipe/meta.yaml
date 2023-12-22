@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.0.5" %}
+{% set version = "0.0.6" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-  sha256: 686840352c90b8e692670e4cf13e583b61340ecd29c6282f2568838b260184b7
+  sha256: 87ce2b5809955635e2c111850ab30db3c1b3164ac4494df980c1b3bdc3347d8c
   patches:
     - 0001-Use-CMAKE_SYSTEM_PROCESSOR-instead-of-CMAKE_HOST_SYS.patch
 
