@@ -10,6 +10,6 @@ if [[ "${target_platform}" != "osx-arm64" ]]; then
   export BLAS_HOME=$PREFIX
   export CMAKE_ARGS="${CMAKE_ARGS} -DMLX_BUILD_METAL=OFF"
 else
-  export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_OSX_ARCHITECTURES=\"x86_64;arm64\" "
+  export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
 fi
 $PYTHON -m pip install . -vv
