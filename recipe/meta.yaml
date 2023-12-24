@@ -18,10 +18,14 @@ build:
 
 requirements:
   build:
-    - python                                 # [build_platform != target_platform]
-    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    # need python in the build section to properly build the extensions
+    - python
+    - cross-python_{{ target_platform }}  # [build_platform != target_platform]
+    # we need to use apple's compilers on arm
+    # otherwise we cannot expose all of the needed metal capabilities
+    # and we get "device not found" type of errors
+    - {{ compiler('c') }}                 # [not (osx and arm64)]
+    - {{ compiler('cxx') }}               # [not (osx and arm64)] 
     - cmake
     - ninja
   host:
@@ -40,6 +44,8 @@ test:
     - python/
   imports:
     - mlx
+    # "core" gets built as an extension and it requires python in build
+    # testing locally showed that the extension gets built with the wrong python otherwise
     - mlx.core
   requires:
     - pip
