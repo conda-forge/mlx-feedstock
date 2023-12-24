@@ -21,11 +21,8 @@ requirements:
     # need python in the build section to properly build the extensions
     - python
     - cross-python_{{ target_platform }}  # [build_platform != target_platform]
-    # we need to use apple's compilers on arm
-    # otherwise we cannot expose all of the needed metal capabilities
-    # and we get "device not found" type of errors
-    - {{ compiler('c') }}                 # [not (osx and arm64)]
-    - {{ compiler('cxx') }}               # [not (osx and arm64)] 
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
     - cmake
     - ninja
   host:
