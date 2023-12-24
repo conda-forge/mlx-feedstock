@@ -45,7 +45,6 @@ jobs:
   steps:
   # TODO: Fast finish on azure pipelines?
   - script: |
-      sudo xcode-select -s /Applications/Xcode_15.1.app
       export CI=azure
       export flow_run_id=azure_$(Build.BuildNumber).$(System.JobAttempt)
       export remote_url=$(Build.Repository.Uri)
