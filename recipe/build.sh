@@ -4,7 +4,7 @@ set -exuo pipefail
 
 export PYPI_RELEASE=1
 export CMAKE_GENERATOR=Ninja
-export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+export DEVELOPER_DIR=/Applications/Xcode_15.1.app/Contents/Developer
 export CMAKE_BUILD_PARALLEL_LEVEL=""
 if [[ "${target_platform}" != "osx-arm64" ]]; then
   export BLAS_HOME=$PREFIX
