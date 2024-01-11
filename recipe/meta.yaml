@@ -33,7 +33,6 @@ requirements:
     - libblas  # [not (osx and arm64)]
   run:
     - python
-    # it appears we need libcxx because we are not using cf compilers...
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
 
 test:
