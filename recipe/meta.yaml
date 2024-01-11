@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.0.7" %}
+{% set version = "0.0.9" %}
 
 package:
   name: {{ name|lower }}
@@ -7,10 +7,8 @@ package:
 
 source:
   # There are no sources on PyPI
-  # url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-  # sha256: fc4f77af40d8e35b0b2073906c652a8f2e7dc0a93c7b45a3a193d7e5412a8119
-  git_url: https://github.com/ml-explore/mlx
-  git_tag: e3e933c6bc1b3057b2a17e001e4cf5fcb1c9902b
+  url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
+  sha256: fe2f5aeda07f580a3ad021cd60294b9b5dbfec648b514f90c85e11eda4c9abec
   patches:
     - 0001-Use-CMAKE_SYSTEM_PROCESSOR-instead-of-CMAKE_HOST_SYS.patch
 
@@ -38,7 +36,6 @@ requirements:
     # it appears we need libcxx because we are not using cf compilers...
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
 
-
 test:
   source_files:
     - python/
@@ -59,6 +56,10 @@ about:
   license: MIT
   license_family: MIT
   license_file: LICENSE
+  description: |
+    MLX is an array framework for machine learning on Apple silicon, brought to you by Apple machine learning research.
+  dev_url: https://ml-explore.github.io/mlx/build/html/index.html
+  doc_url: https://github.com/ml-explore/mlx
 
 extra:
   recipe-maintainers:
