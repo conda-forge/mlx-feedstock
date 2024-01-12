@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.0.7" %}
+{% set version = "0.0.9" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,9 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-  sha256: fc4f77af40d8e35b0b2073906c652a8f2e7dc0a93c7b45a3a193d7e5412a8119
+  sha256: fe2f5aeda07f580a3ad021cd60294b9b5dbfec648b514f90c85e11eda4c9abec
+  patches:
+    - 0001-Use-CMAKE_SYSTEM_PROCESSOR-instead-of-CMAKE_HOST_SYS.patch
 
 build:
   skip: true  # [win]
@@ -16,6 +18,9 @@ build:
 
 requirements:
   build:
+    # need python in the build section to properly build the extensions
+    - python
+    - cross-python_{{ target_platform }}  # [build_platform != target_platform]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake
@@ -24,12 +29,11 @@ requirements:
     - python
     - pip
     - pybind11
-    - blas
-    - libblas
+    - blas     # [not (osx and arm64)]
+    - libblas  # [not (osx and arm64)]
   run:
     - python
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
-
 
 test:
   source_files:
@@ -43,7 +47,7 @@ test:
   commands:
     - pip check
     # Tests are passing only if you have more than 8GB of RAM.
-    # - python -m unittest discover python/tests
+    - python -m unittest discover python/tests  # [osx and arm64]
 
 about:
   home: https://github.com/ml-explore/mlx
@@ -51,6 +55,10 @@ about:
   license: MIT
   license_family: MIT
   license_file: LICENSE
+  description: |
+    MLX is an array framework for machine learning on Apple silicon, brought to you by Apple machine learning research.
+  dev_url: https://ml-explore.github.io/mlx/build/html/index.html
+  doc_url: https://github.com/ml-explore/mlx
 
 extra:
   recipe-maintainers:
