@@ -9,7 +9,7 @@ export CMAKE_BUILD_PARALLEL_LEVEL=""
 if [[ "${target_platform}" != "osx-arm64" ]]; then
   export BLAS_HOME=$PREFIX
   export CMAKE_ARGS="${CMAKE_ARGS} -DMLX_BUILD_METAL=OFF"
-elif [[ "$target_platform" == "osx-arm64" && "$CONDA_BUILD_CROSS_COMPILATION" == "1" ]]; then
+elif [[ "$target_platform" == "osx-arm64" && "${CONDA_BUILD_CROSS_COMPILATION:-0}" == "1" ]]; then
   export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_OSX_ARCHITECTURES=arm64"
 fi
 $PYTHON -m pip install . -vv
