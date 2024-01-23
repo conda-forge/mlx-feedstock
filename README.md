@@ -302,5 +302,6 @@ In order to produce a uniquely identifiable distribution:
 Feedstock Maintainers
 =====================
 
+* [@ngam](https://github.com/ngam/)
 * [@xhochy](https://github.com/xhochy/)
 
