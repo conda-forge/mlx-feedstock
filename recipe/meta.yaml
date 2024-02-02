@@ -29,8 +29,9 @@ requirements:
     - python
     - pip
     - pybind11
-    - blas     # [not (osx and arm64)]
-    - libblas  # [not (osx and arm64)]
+    - blas       # [not (osx and arm64)]
+    - libblas    # [not (osx and arm64)]
+    - liblapack  # [not (osx and arm64)]
   run:
     - python
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
