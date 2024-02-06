@@ -17,14 +17,14 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 -    message(FATAL_ERROR
 +  if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64" AND ${CMAKE_HOST_APPLE})
 +    message(WARNING
-       "Building for x86_64 on macOS is not supported." 
+       "Building for x86_64 on macOS is not supported."
        " If you are on an Apple silicon system, check the build"
        " documentation for possible fixes: "
        "https://ml-explore.github.io/mlx/build/html/install.html#build-from-source")
 -  elseif (${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "x86_64")
 +  elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
-     message(WARNING 
-       "Building for x86_64 on macOS is not supported." 
+     message(WARNING
+       "Building for x86_64 on macOS is not supported."
        " If you are on an Apple silicon system, "
        " make sure you are building for arm64.")
 -  elseif(${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "arm64")

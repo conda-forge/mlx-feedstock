@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.0.11" %}
+{% set version = "0.1.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-  sha256: 56e0a35a02d30adf6f9104f62f17c601862c255a2fd8dca1e9d45fcb86ffd6d1
+  sha256: d158856583a97b3cc0d4208e3c1a2b168c397bcb3a2f8745e5ae5db9482a6f1f
   patches:
     - 0001-Use-CMAKE_SYSTEM_PROCESSOR-instead-of-CMAKE_HOST_SYS.patch
 
@@ -29,8 +29,9 @@ requirements:
     - python
     - pip
     - pybind11
-    - blas     # [not (osx and arm64)]
-    - libblas  # [not (osx and arm64)]
+    - blas       # [not (osx and arm64)]
+    - libblas    # [not (osx and arm64)]
+    - liblapack  # [not (osx and arm64)]
   run:
     - python
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
