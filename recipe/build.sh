@@ -14,7 +14,7 @@ elif [[ "$target_platform" == "osx-arm64" && "${CONDA_BUILD_CROSS_COMPILATION:-0
 fi
 if [[ "${target_platform}" == linux-* ]]; then
   export LDFLAGS="-lblas ${LDFLAGS}"
-elif [[ "${target_platform}" == "osx-64" ]]; then
+elif [[ "${target_platform}" == "osx-64" ]]; then
   export LDFLAGS="$LDFLAGS -llapacke -llapack"
 fi
 $PYTHON -m pip install . -vv
