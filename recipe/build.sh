@@ -17,4 +17,6 @@ if [[ "${target_platform}" == linux-* ]]; then
 elif [[ "${target_platform}" == "osx-64" ]]; then
   export LDFLAGS="$LDFLAGS -llapacke -llapack"
 fi
+
+$PYTHON -m pip install git+https://github.com/wjakob/nanobind.git
 $PYTHON -m pip install . -vv
