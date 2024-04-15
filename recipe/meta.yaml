@@ -13,7 +13,7 @@ source:
     - 0001-Use-CMAKE_SYSTEM_PROCESSOR-instead-of-CMAKE_HOST_SYS.patch
 
 build:
-  skip: true  # [win or py<39]
+  skip: true  # [win or py<39 or (osx and x86_64)]
   number: 0
 
 requirements:
