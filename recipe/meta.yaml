@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.9.0" %}
+{% set version = "0.10.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # There are no sources on PyPI
   - url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-    sha256: eac63ca7933fda7fda753537975cce6705801ee3231471e48abe35117eb62b05
+    sha256: 09e9859e364ee8d19bf656730b7d6a471c8da2d397325efd1c73b836819f6e56
   - url: https://github.com/wjakob/nanobind/archive/03ebcb883a8658706bada56e7bc11faf2e2b3f67.zip
     sha256: cdadb150a0534582bc1760cd1ae2e9b99b8b3cbc09a1ef462d9aebd1070764c4
     folder: nanobind
