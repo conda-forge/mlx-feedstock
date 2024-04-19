@@ -1,0 +1,22 @@
+From 64529dbf6199309b7179cf189778dcbd7752c227 Mon Sep 17 00:00:00 2001
+From: "Uwe L. Korn" <uwe.korn@quantco.com>
+Date: Fri, 19 Apr 2024 16:29:32 +0200
+Subject: [PATCH] Don't ignore failed patch
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9cd6c53..c36363d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -94,7 +94,7 @@ elseif (MLX_BUILD_METAL)
+   FetchContent_Declare(
+     metal_cpp
+     URL ${METAL_CPP_URL}
+-    PATCH_COMMAND patch -N -i ${METAL_CPP_PATCH} || true
++    PATCH_COMMAND /usr/bin/patch -N -i ${METAL_CPP_PATCH}
+   )
+ 
+   FetchContent_MakeAvailable(metal_cpp)

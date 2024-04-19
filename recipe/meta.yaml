@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.10.0" %}
+{% set version = "0.11.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,14 +7,10 @@ package:
 
 source:
   # There are no sources on PyPI
-  - url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-    sha256: 09e9859e364ee8d19bf656730b7d6a471c8da2d397325efd1c73b836819f6e56
-  - url: https://github.com/wjakob/nanobind/archive/03ebcb883a8658706bada56e7bc11faf2e2b3f67.zip
-    sha256: cdadb150a0534582bc1760cd1ae2e9b99b8b3cbc09a1ef462d9aebd1070764c4
-    folder: nanobind
-  - url: https://github.com/Tessil/robin-map/archive/68ff7325b3898fca267a103bad5c509e8861144d.tar.gz
-    sha256: 98e79b94950cbf6c645205d07c4752daa4926ecff5a0cf914c134ba59b9b1c29
-    folder: nanobind/ext/robin_map
+  url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
+  sha256: 4c4d6fd2630895d30ad9e576499211736d1c549f63b319c796851bb828513a7f
+  patches:
+    - 0001-Don-t-ignore-failed-patch.patch
 
 build:
   skip: true  # [win or py<39 or (osx and x86_64)]
@@ -26,19 +22,19 @@ requirements:
     - python
     - cross-python_{{ target_platform }}  # [build_platform != target_platform]
     - {{ compiler('c') }}
+    - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
     - cmake
     - ninja
   host:
     - python
     - pip
-    # - nanobind
+    - nanobind
     - blas       # [not (osx and arm64)]
     - libblas    # [not (osx and arm64)]
     - liblapack  # [not (osx and arm64)]
   run:
     - python
-    - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
 
 test:
   source_files:

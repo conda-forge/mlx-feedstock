@@ -19,11 +19,4 @@ elif [[ "${target_platform}" == "osx-64" ]]; then
 fi
 export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_PREFIX_PATH=${PREFIX};${SP_DIR} -DPython_EXECUTABLE=$PYTHON"
 
-pushd nanobind
 $PYTHON -m pip install . -vv
-popd
-
-$PYTHON -m pip install . -vv
-
-# Remove nanobind again, we don't want to bundle it in the mlx package.
-$PYTHON -m pip uninstall -y nanobind
