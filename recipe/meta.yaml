@@ -7,8 +7,10 @@ package:
 
 source:
   # There are no sources on PyPI
-  - url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-    sha256: 4c4d6fd2630895d30ad9e576499211736d1c549f63b319c796851bb828513a7f
+  url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
+  sha256: 4c4d6fd2630895d30ad9e576499211736d1c549f63b319c796851bb828513a7f
+  patches:
+    - 0001-Don-t-ignore-failed-patch.patch
 
 build:
   skip: true  # [win or py<39 or (osx and x86_64)]
