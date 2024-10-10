@@ -9,6 +9,8 @@ source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
   sha256: 3092f3f4d824240a8966d6af90c8b59ec4931eff98d213e0552125357df812f5
+  patches:
+    - 0001-More-stable-invocation-of-stub-generation.patch
 
 build:
   skip: true  # [win or py<39 or (osx and x86_64)]

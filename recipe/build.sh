@@ -19,5 +19,5 @@ elif [[ "${target_platform}" == "osx-64" ]]; then
 fi
 export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_PREFIX_PATH=${PREFIX};${SP_DIR} -DPython_EXECUTABLE=$PYTHON"
 
-$PYTHON setup.py generate_stubs
 $PYTHON -m pip install . -vv
+$PYTHON setup.py generate_stubs
