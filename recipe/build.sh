@@ -20,3 +20,4 @@ fi
 export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_PREFIX_PATH=${PREFIX};${SP_DIR} -DPython_EXECUTABLE=$PYTHON"
 
 $PYTHON -m pip install . -vv
+$PYTHON setup.py generate_stubs

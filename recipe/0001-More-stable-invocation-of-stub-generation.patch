@@ -1,0 +1,34 @@
+From 0cf63f0ae56dc29a96d0aacfdb71f21a61a10bbf Mon Sep 17 00:00:00 2001
+From: "Uwe L. Korn" <uwe.korn@quantco.com>
+Date: Thu, 10 Oct 2024 10:09:33 +0200
+Subject: [PATCH] More stable invocation of stub generation
+
+---
+ setup.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 66bb584..967a9a5 100644
+--- a/setup.py
++++ b/setup.py
+@@ -136,16 +136,16 @@ class GenerateStubs(Command):
+     def run(self) -> None:
+         out_path = "python/mlx/core"
+         stub_cmd = [
+-            "python",
++            sys.executable,
+             "-m",
+             "nanobind.stubgen",
+             "-m",
+             "mlx.core",
+         ]
+-        subprocess.run(stub_cmd + ["-r", "-O", out_path])
++        subprocess.check_call(stub_cmd + ["-r", "-O", out_path])
+         # Run again without recursive to specify output file name
+-        subprocess.run(["rm", f"{out_path}/mlx.pyi"])
+-        subprocess.run(stub_cmd + ["-o", f"{out_path}/__init__.pyi"])
++        os.unlink(f"{out_path}/mlx.pyi")
++        subprocess.check_call(stub_cmd + ["-o", f"{out_path}/__init__.pyi"])
+ 
+ 
+ # Read the content of README.md
