@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.18.0" %}
+{% set version = "0.18.1" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-  sha256: 3092f3f4d824240a8966d6af90c8b59ec4931eff98d213e0552125357df812f5
+  sha256: 6a86ccb0cb54e45bcc782ed4ca878935e64f24fbc38497f65e606e43d3280f8c
   patches:
     - 0001-More-stable-invocation-of-stub-generation.patch
 
