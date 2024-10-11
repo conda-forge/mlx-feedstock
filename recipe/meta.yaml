@@ -9,10 +9,12 @@ source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
   sha256: 6a86ccb0cb54e45bcc782ed4ca878935e64f24fbc38497f65e606e43d3280f8c
+  patches:
+    - 0001-More-stable-invocation-of-stub-generation.patch
 
 build:
   skip: true  # [win or py<39 or (osx and x86_64)]
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -28,6 +30,8 @@ requirements:
     - python
     - pip
     - nanobind
+    - typing_extensions
+    - setuptools
     - blas       # [not (osx and arm64)]
     - libblas    # [not (osx and arm64)]
     - liblapack  # [not (osx and arm64)]
@@ -48,6 +52,7 @@ test:
     - pip check
     # Tests are passing only if you have more than 8GB of RAM.
     - python -m unittest discover python/tests  # [osx and arm64]
+    - test -f $SP_DIR/mlx/core/__init__.pyi
 
 about:
   home: https://github.com/ml-explore/mlx
