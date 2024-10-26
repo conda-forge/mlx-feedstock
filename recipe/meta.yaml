@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.19.0" %}
+{% set version = "0.19.1" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-  sha256: 25632a9d46623832b0b12d8810442508aa7c155818b252115743438375f60db5
+  sha256: b6b76d5ddbe4ff7c667425fec2a67dc0abd258b734e708b1b45fd73910a2dc83
 
 build:
   skip: true  # [win or py<39 or (osx and x86_64)]
