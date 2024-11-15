@@ -12,7 +12,7 @@ source:
 
 build:
   skip: true  # [win or py<39 or (osx and x86_64)]
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -28,6 +28,7 @@ requirements:
     - python
     - pip
     - nanobind
+    - setuptools
     - blas       # [not (osx and arm64)]
     - libblas    # [not (osx and arm64)]
     - liblapack  # [not (osx and arm64)]
