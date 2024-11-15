@@ -28,6 +28,7 @@ requirements:
     - python
     - pip
     - nanobind
+    - setuptools
     - blas       # [not (osx and arm64)]
     - libblas    # [not (osx and arm64)]
     - liblapack  # [not (osx and arm64)]
