@@ -1,0 +1,25 @@
+From 477bae63f7d1508f3a29711ae2c723704be332c2 Mon Sep 17 00:00:00 2001
+From: "Uwe L. Korn" <uwe.korn@quantco.com>
+Date: Wed, 27 Nov 2024 11:49:57 +0100
+Subject: [PATCH] Omit visionOS from sources
+
+---
+ mlx/backend/metal/device.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mlx/backend/metal/device.cpp b/mlx/backend/metal/device.cpp
+index 8f8a446..24ddb9e 100644
+--- a/mlx/backend/metal/device.cpp
++++ b/mlx/backend/metal/device.cpp
+@@ -25,9 +25,9 @@ constexpr const char* default_mtllib_path = METAL_PATH;
+ 
+ auto get_metal_version() {
+   auto get_metal_version_ = []() {
+-    if (__builtin_available(macOS 15, iOS 18, tvOS 18, visionOS 2, *)) {
++    if (__builtin_available(macOS 15, iOS 18, tvOS 18, *)) {
+       return MTL::LanguageVersion3_2;
+-    } else if (__builtin_available(macOS 14, iOS 17, tvOS 17, visionOS 1, *)) {
++    } else if (__builtin_available(macOS 14, iOS 17, tvOS 17, *)) {
+       return MTL::LanguageVersion3_1;
+     } else {
+       return MTL::LanguageVersion3_0;
