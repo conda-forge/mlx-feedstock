@@ -11,7 +11,7 @@ c_stdlib:
 c_stdlib_version:
 - '14.5'
 channel_sources:
-- conda-forge/label/nanobind_dev,conda-forge
+- conda-forge
 channel_targets:
 - conda-forge main
 cxx_compiler:
