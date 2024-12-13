@@ -1,5 +1,5 @@
 {% set name = "mlx" %}
-{% set version = "0.21.0" %}
+{% set version = "0.21.1" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v{{ version }}.tar.gz
-  sha256: 41f8ff1b5367b4d1a3ca9c026e857bdcf5ec777e781a957ddfea3b21d7dfea6d
+  sha256: 1ce949256c343a4a9fb1e53cc15f537ad2faceccbb3ad314cd47a198b534bcac
   patches:
     - 0001-Omit-visionOS-from-sources.patch
 
@@ -24,16 +24,17 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
-    - cmake
+    - cmake >=3.24
     - ninja
   host:
     - python
     - pip
-    - nanobind
-    - setuptools
-    - blas       # [not (osx and arm64)]
-    - libblas    # [not (osx and arm64)]
-    - liblapack  # [not (osx and arm64)]
+    - nanobind 2.2.0
+    - setuptools >=42
+    - libblas     # [not (osx and arm64)]
+    - libcblas    # [not (osx and arm64)]
+    - liblapack   # [not (osx and arm64)]
+    - liblapacke  # [not (osx and arm64)]
   run:
     - python
 

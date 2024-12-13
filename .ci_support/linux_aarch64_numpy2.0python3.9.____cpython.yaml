@@ -9,7 +9,7 @@ c_stdlib_version:
 cdt_name:
 - conda
 channel_sources:
-- conda-forge/label/nanobind_dev,conda-forge
+- conda-forge
 channel_targets:
 - conda-forge main
 cxx_compiler:
@@ -20,16 +20,20 @@ docker_image:
 - quay.io/condaforge/linux-anvil-x86_64:alma9
 libblas:
 - 3.9 *netlib
+libcblas:
+- 3.9 *netlib
 liblapack:
 - 3.9 *netlib
+liblapacke:
+- 3.9 *netlib
 numpy:
-- '1.22'
+- '2.0'
 pin_run_as_build:
   python:
     min_pin: x.x
     max_pin: x.x
 python:
-- 3.10.* *_cpython
+- 3.9.* *_cpython
 target_platform:
 - linux-aarch64
 zip_keys:
