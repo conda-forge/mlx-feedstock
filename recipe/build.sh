@@ -17,6 +17,6 @@ if [[ "${target_platform}" == linux-* ]]; then
 elif [[ "${target_platform}" == "osx-64" ]]; then
   export LDFLAGS="$LDFLAGS -llapacke -llapack"
 fi
-export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_PREFIX_PATH=${PREFIX};${SP_DIR} -DPython_EXECUTABLE=$PYTHON"
+export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_PREFIX_PATH=${PREFIX};${SP_DIR} -DPython_EXECUTABLE=$PYTHON -DPython_INCLUDE_DIR=${PREFIX}/include/python${PY_VER}"
 
 $PYTHON -m pip install . -vv
