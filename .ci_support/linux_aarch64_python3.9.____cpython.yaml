@@ -27,7 +27,7 @@ liblapack:
 liblapacke:
 - 3.9.* *netlib
 numpy:
-- '2.0'
+- '2'
 pin_run_as_build:
   python:
     min_pin: x.x
@@ -35,9 +35,7 @@ pin_run_as_build:
 python:
 - 3.9.* *_cpython
 target_platform:
-- linux-64
+- linux-aarch64
 zip_keys:
 - - c_compiler_version
   - cxx_compiler_version
-- - python
-  - numpy
