@@ -1,0 +1,79 @@
+schema_version: 1
+
+context:
+  name: mlx
+  version: 0.29.0
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  # There are no sources on PyPI
+  url: https://github.com/ml-explore/mlx/archive/v${{ version }}.tar.gz
+  sha256: 7b5a43673f822e5ae28507f43127b10080db3e8da73d99a2efa5b34dbadd2bc4
+  patches:
+    - 0001-Omit-visionOS-from-sources.patch
+
+build:
+  number: 0
+  skip: win or match(python, "<3.9") or (osx and x86_64)
+
+requirements:
+  build:
+    # need python in the build section to properly build the extensions
+    - python
+    - if: build_platform != target_platform
+      then: cross-python_${{ target_platform }}
+    - ${{ compiler('c') }}
+    - ${{ stdlib("c") }}
+    - ${{ compiler('cxx') }}
+    - cmake >=3.24
+    - ninja
+  host:
+    - python
+    - pip
+    - nanobind
+    - setuptools >=42
+    - if: not (osx and arm64)
+      then: libblas
+    - if: not (osx and arm64)
+      then: libcblas
+    - if: not (osx and arm64)
+      then: liblapack
+    - if: not (osx and arm64)
+      then: liblapacke
+  run:
+    - python
+
+tests:
+  - python:
+      imports:
+        - mlx
+        - mlx.core
+  - files:
+      source:
+        - python/
+    requirements:
+      run:
+        - pip
+        - numpy
+    script:
+      - pip check
+      - if: osx and arm64
+        then: python -m unittest discover python/tests
+
+about:
+  summary: An array framework for Apple silicon
+  license: MIT
+  license_file: LICENSE
+  description: |
+    MLX is an array framework for machine learning on Apple silicon, brought to you by Apple machine learning research.
+  homepage: https://github.com/ml-explore/mlx
+  repository: https://ml-explore.github.io/mlx/build/html/index.html
+  documentation: https://github.com/ml-explore/mlx
+
+extra:
+  recipe-maintainers:
+    - xhochy
+    - ngam
