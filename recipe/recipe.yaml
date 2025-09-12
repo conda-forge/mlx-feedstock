@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: mlx
-  version: 0.29.0
+  version: "0.29.1"
 
 package:
   name: ${{ name|lower }}
@@ -11,7 +11,7 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v${{ version }}.tar.gz
-  sha256: 7b5a43673f822e5ae28507f43127b10080db3e8da73d99a2efa5b34dbadd2bc4
+  sha256: 078027dcf08d604f56ab13c5a0ec9071281e6b5c6bb3e1af78f882617c183555
   patches:
     - 0001-Omit-visionOS-from-sources.patch
 
@@ -36,13 +36,11 @@ requirements:
     - nanobind
     - setuptools >=42
     - if: not (osx and arm64)
-      then: libblas
-    - if: not (osx and arm64)
-      then: libcblas
-    - if: not (osx and arm64)
-      then: liblapack
-    - if: not (osx and arm64)
-      then: liblapacke
+      then:
+        - libblas
+        - libcblas
+        - liblapack
+        - liblapacke
   run:
     - python
 
