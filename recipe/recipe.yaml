@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: mlx
-  version: "0.30.4"
+  version: "0.30.5"
 
 package:
   name: ${{ name|lower }}
@@ -11,7 +11,7 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v${{ version }}.tar.gz
-  sha256: e07dae3e41b0c0e4d1a6e3b3bf8fa0aa7b9d9cdb66497534b91c476d7e253740
+  sha256: 448eefb3c9d4f42001e7e3236b2a33326a892dee520aaf4da60c2fa5c11182e2
   patches:
     - 0001-Omit-visionOS-from-sources.patch
 
