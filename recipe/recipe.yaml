@@ -16,7 +16,7 @@ source:
     - 0001-Omit-visionOS-from-sources.patch
 
 build:
-  number: 0
+  number: 1
   skip: win or match(python, "<3.9") or (osx and x86_64)
 
 requirements:

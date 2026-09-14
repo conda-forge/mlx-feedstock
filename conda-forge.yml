@@ -1,8 +1,6 @@
 bot:
   automerge: true
   inspection: update-grayskull
-build_platform:
-  osx_arm64: osx_64
 conda_build:
   error_overlinking: true
 conda_forge_output_validation: true
@@ -13,4 +11,5 @@ github:
   tooling_branch_name: main
 provider:
   linux_aarch64: default
+  osx_arm64: default
 test: native
