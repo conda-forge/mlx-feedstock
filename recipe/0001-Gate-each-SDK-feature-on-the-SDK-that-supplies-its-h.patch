@@ -1,0 +1,112 @@
+From 0defb9e62e3d7efe3fb1c110b9eb49b2a641bdc9 Mon Sep 17 00:00:00 2001
+From: conda-forge <noreply@conda-forge.org>
+Date: Tue, 4 Aug 2026 17:37:14 -0400
+Subject: [PATCH] Gate each SDK feature on the SDK that supplies its headers
+
+A macOS build of MLX draws on two different SDKs, and cannot avoid it: the
+C/C++ compilation uses CMAKE_OSX_SYSROOT, while the Metal shaders are compiled
+by `xcrun metal`, which is Xcode's and resolves its framework headers from
+Xcode's SDK. Those coincide on a stock developer machine, but not when the
+sysroot is pinned to a separately provisioned SDK, as conda-forge does.
+
+MLX derives a single MACOS_SDK_VERSION from `xcrun --show-sdk-version` and
+gates both kinds of feature on it. When the two SDKs diverge that is wrong in
+both directions. Building against a pinned macOS 26.1 sysroot under Xcode 26.5,
+it reported 26.5 and so enabled the JACCL (RDMA-over-Thunderbolt) backend,
+whose header is absent from the sysroot the C++ compiler actually sees:
+
+    mlx/distributed/jaccl/lib/jaccl/rdma.h:5:10:
+      fatal error: 'infiniband/verbs.h' file not found
+
+Split the probe in two and gate each feature on whichever SDK provides its
+headers:
+
+  - MACOS_SDK_VERSION now describes the C/C++ sysroot, read from
+    CMAKE_OSX_SYSROOT/SDKSettings.json when a sysroot is pinned. JACCL and the
+    >= 14.0 floor key off this, so JACCL correctly stays off above.
+
+  - MLX_METAL_SDK_VERSION keeps the existing `xcrun --show-sdk-version` probe
+    and gates the NAX kernels, whose MetalPerformancePrimitives headers come
+    from the Metal toolchain's SDK.
+
+Without a pinned sysroot the two are identical and behaviour is unchanged, so a
+plain `cmake ..` on a developer machine is unaffected.
+
+The NAX SDK floor stays at 26.2. It is a real requirement, not a conservative
+one: the 26.1 SDK ships MetalPerformancePrimitives and mpp::tensor_ops::matmul2d
+but not the cooperative-tensor accessors the kernels call, so building against
+it fails with
+
+    steel/gemm/nax.h:416: error: no member named
+      'get_left_input_cooperative_tensor' in 'mpp::tensor_ops::matmul2d<...>'
+
+Only the NAX deployment-target floor moves, from 26.2 to 26.0, because
+conda-forge publishes macosx_deployment_target only up to 26.0 and the kernels
+would otherwise stay compiled out there permanently. That is safe: Metal 4.0 is
+available at -mmacosx-version-min=26.0, and lowering the build-time floor does
+not lower the runtime one -- dispatch still goes through is_nax_available(),
+which requires __builtin_available(macOS 26.2, *) plus a GPU-generation check
+before any NAX kernel is selected.
+---
+ CMakeLists.txt                           | 19 +++++++++++++++++--
+ mlx/backend/metal/kernels/CMakeLists.txt |  7 +++++--
+ 2 files changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3f233048..7ee40af7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -192,17 +192,32 @@ if(MLX_BUILD_METAL)
+       OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+     message(STATUS "Building on macOS ${MACOS_VERSION}")
+ 
+-    # Get macOS SDK version.
++    # Get macOS SDK version, for the C/C++ side of the build. That is the SDK
++    # at CMAKE_OSX_SYSROOT when one is pinned, which is not necessarily the one
++    # the selected Xcode defaults to; gating C++ features on the latter enables
++    # code whose headers the compiler will never see. Fall back to the Xcode
++    # probe when no sysroot is pinned.
+     execute_process(
+       COMMAND xcrun -sdk macosx --show-sdk-version
+-      OUTPUT_VARIABLE MACOS_SDK_VERSION
++      OUTPUT_VARIABLE MLX_METAL_SDK_VERSION
+       OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
++    if(CMAKE_OSX_SYSROOT
++       AND IS_DIRECTORY "${CMAKE_OSX_SYSROOT}"
++       AND EXISTS "${CMAKE_OSX_SYSROOT}/SDKSettings.json")
++      file(READ "${CMAKE_OSX_SYSROOT}/SDKSettings.json" MLX_SDK_SETTINGS)
++      string(JSON MACOS_SDK_VERSION GET "${MLX_SDK_SETTINGS}" "Version")
++      message(STATUS "Using the SDK at ${CMAKE_OSX_SYSROOT} for C/C++")
++    else()
++      set(MACOS_SDK_VERSION "${MLX_METAL_SDK_VERSION}")
++    endif()
+     if(MACOS_SDK_VERSION VERSION_LESS 14.0)
+       message(
+         FATAL_ERROR
+           "MLX requires macOS SDK >= 14.0 to be built with MLX_BUILD_METAL=ON")
+     endif()
+     message(STATUS "Building with macOS ${MACOS_SDK_VERSION} SDK")
++    message(
++      STATUS "Building Metal shaders with macOS ${MLX_METAL_SDK_VERSION} SDK")
+ 
+     # Build for the host system if CMAKE_OSX_DEPLOYMENT_TARGET is not set.
+     if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+diff --git a/mlx/backend/metal/kernels/CMakeLists.txt b/mlx/backend/metal/kernels/CMakeLists.txt
+index 355c763a..2ada09f5 100644
+--- a/mlx/backend/metal/kernels/CMakeLists.txt
++++ b/mlx/backend/metal/kernels/CMakeLists.txt
+@@ -164,9 +164,12 @@ if(NOT MLX_METAL_JIT)
+   build_kernel(gemv_masked steel/utils.h)
+   build_kernel(steel/attn/kernels/steel_attention ${STEEL_ATTN_HEADERS})
+ 
++  # Gate on MLX_METAL_SDK_VERSION, the SDK `xcrun metal` compiles these shaders
++  # against, rather than on MACOS_SDK_VERSION, which describes the C/C++
++  # sysroot: MetalPerformancePrimitives comes from the former.
+   if(MLX_METAL_VERSION GREATER_EQUAL 400
+-     AND MACOS_SDK_VERSION VERSION_GREATER_EQUAL 26.2
+-     AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_GREATER_EQUAL 26.2)
++     AND MLX_METAL_SDK_VERSION VERSION_GREATER_EQUAL 26.2
++     AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_GREATER_EQUAL 26.0)
+ 
+     build_kernel(steel/gemm/kernels/steel_gemm_fused_nax ${STEEL_NAX_HEADERS})
+     build_kernel(steel/gemm/kernels/steel_gemm_gather_nax ${STEEL_NAX_HEADERS})

@@ -1,0 +1,96 @@
+From a22236e239006547d124771bd5403889781b6be8 Mon Sep 17 00:00:00 2001
+From: conda-forge <noreply@conda-forge.org>
+Date: Tue, 4 Aug 2026 17:37:14 -0400
+Subject: [PATCH] Never JIT for a newer Metal version than the build targeted
+
+MLX chooses the Metal language version for its runtime (JIT) compiles purely
+from __builtin_available. Built with conda-forge's clang 19 against the macOS
+14.5 SDK, the macOS 26 arm of that check evaluates true on a macOS 15.7.7 host
+-- silently, with no compiler diagnostic -- so MLX asks for Metal 4.0 from a
+runtime compiler that stops at 3.2, and every runtime compile dies:
+
+    libc++abi: terminating due to uncaught exception of type std::runtime_error:
+      [metal::Device] Unable to build metal library from source
+    error: invalid value 'metal4.0' in '-std=metal4.0'
+
+The chain is exact rather than inferred: '-std=metal4.0' can only come from
+setLanguageVersion(), there is one such call, it is fed by get_metal_version(),
+and only the macOS 26 branch returns LanguageVersion4_0.
+
+Rather than try to outguess __builtin_available, clamp its answer with
+something the build already established. CMake probes the real Metal compiler
+for __METAL_VERSION__ at configure time and stores it in MLX_METAL_VERSION;
+export that to C++ and use it as a ceiling. The AOT kernels in mlx.metallib
+were compiled for exactly that version, so it is the strongest evidence
+available that the runtime can handle it, and anything beyond it was never
+validated by the build in the first place.
+
+A build whose Metal toolchain reported 310 therefore JITs at metal3.1, one that
+reported 400 still JITs at metal4.0 once the host really is macOS 26. When the
+version is unknown (0, as on iOS where detection is deferred) no ceiling is
+applied and behaviour is unchanged.
+---
+ CMakeLists.txt               |  6 ++++++
+ mlx/backend/metal/device.cpp | 27 ++++++++++++++++++++++-----
+ 2 files changed, 28 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7ee40af7..b6534941 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -241,6 +241,12 @@ if(MLX_BUILD_METAL)
+     set(MLX_METAL_VERSION 0)
+   endif()
+ 
++  # Let the runtime know which Metal version this library was actually compiled
++  # against, so it never asks the runtime compiler for a newer one. 0 means
++  # "unknown", in which case no ceiling is applied.
++  target_compile_definitions(
++    mlx PRIVATE MLX_BUILD_METAL_VERSION=${MLX_METAL_VERSION})
++
+   set(METAL_CPP_URL
+       https://developer.apple.com/metal/cpp/files/metal-cpp_26.zip)
+   FetchContent_Declare(metal_cpp URL ${METAL_CPP_URL})
+diff --git a/mlx/backend/metal/device.cpp b/mlx/backend/metal/device.cpp
+index 493e8e31..1c91b1df 100644
+--- a/mlx/backend/metal/device.cpp
++++ b/mlx/backend/metal/device.cpp
+@@ -64,16 +64,33 @@ void set_compile_options(
+ 
+ auto get_metal_version() {
+   auto get_metal_version_ = []() {
++    auto version = MTL::LanguageVersion3_1;
+     if (__builtin_available(macOS 27, iOS 27, tvOS 27, visionOS 27, *)) {
+       // TODO: Use MTL::LanguageVersion4_1 after metal-cpp_27 is released.
+-      return static_cast<MTL::LanguageVersion>((4 << 16) + 1);
++      version = static_cast<MTL::LanguageVersion>((4 << 16) + 1);
+     } else if (__builtin_available(macOS 26, iOS 26, tvOS 26, visionOS 26, *)) {
+-      return MTL::LanguageVersion4_0;
++      version = MTL::LanguageVersion4_0;
+     } else if (__builtin_available(macOS 15, iOS 18, tvOS 18, visionOS 2, *)) {
+-      return MTL::LanguageVersion3_2;
+-    } else {
+-      return MTL::LanguageVersion3_1;
++      version = MTL::LanguageVersion3_2;
+     }
++#if defined(MLX_BUILD_METAL_VERSION) && MLX_BUILD_METAL_VERSION > 0
++    // Never ask the runtime compiler for a language version newer than the one
++    // this library was compiled against: the AOT kernels were built for that
++    // version, and the toolchain that produced them is the only evidence we
++    // have that the runtime can handle it. Guards against __builtin_available
++    // over-reporting, which is how a macOS 15 host ends up requesting
++    // Metal 4.0 and failing every runtime compile.
++    if (MLX_BUILD_METAL_VERSION < 410 && version > MTL::LanguageVersion4_0) {
++      version = MTL::LanguageVersion4_0;
++    }
++    if (MLX_BUILD_METAL_VERSION < 400 && version > MTL::LanguageVersion3_2) {
++      version = MTL::LanguageVersion3_2;
++    }
++    if (MLX_BUILD_METAL_VERSION < 320 && version > MTL::LanguageVersion3_1) {
++      version = MTL::LanguageVersion3_1;
++    }
++#endif
++    return version;
+   };
+   static auto metal_version_ = get_metal_version_();
+   return metal_version_;

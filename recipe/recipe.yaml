@@ -2,7 +2,8 @@ schema_version: 1
 
 context:
   name: mlx
-  version: "0.32.0"
+  version: "0.32.4"
+  build_number: 0
 
 package:
   name: ${{ name|lower }}
@@ -11,13 +12,42 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v${{ version }}.tar.gz
-  sha256: 8e74a0eb613861ce50c09402dd99dbc42b65a762e7fdd291caa39f611db978ec
+  sha256: 0276db8d7bf1af8db6d4ae25c7c550abea4d5b3b6a16207610a5d4a0c19fe1a0
+  # Applied unconditionally: both touch only code inside `if(MLX_BUILD_METAL)`
+  # and the Metal-only backend, which is compiled out everywhere but macOS, so
+  # neither needs a platform selector to be safe.
   patches:
-    - 0001-Omit-visionOS-from-sources.patch
+    - 0001-Gate-each-SDK-feature-on-the-SDK-that-supplies-its-h.patch
+    - 0002-Never-JIT-for-a-newer-Metal-version-than-the-build-t.patch
 
 build:
-  number: 0
-  skip: win or match(python, "<3.9") or (osx and x86_64)
+  # osx-arm64 is built once per macOS SDK tier (see conda_build_config.yaml).
+  # Encoding the deployment target's major version in the build number makes
+  # the ordering between the tiers explicit -- 14.5 -> 1400, 26.0 -> 2600 --
+  # so the newest tier a host can actually run always wins the solve.
+  number: ${{ (c_stdlib_version | split(".") | first | int) * 100 + build_number if osx else build_number }}
+  # The old `match(python, "<3.9")` term is gone as redundant: conda-forge
+  # builds nothing below 3.10 today, so it could never select anything.
+  skip: win or (osx and x86_64)
+  variant:
+    # conda-smithy writes *both* tiers' deployment targets into *every*
+    # .ci_support/osx_arm64_* file, because it derives MACOSX_DEPLOYMENT_TARGET
+    # from c_stdlib_version per variant but never zips the two together.  Left
+    # alone, rattler-build reads that two-valued key as a variant axis of its
+    # own and builds each tier twice, publishing two same-version packages that
+    # differ only in a build hash.
+    #
+    # The value in that file is dead weight anyway: MACOSX_DEPLOYMENT_TARGET in
+    # the build environment comes from the activate.d script of the
+    # macosx_deployment_target_osx-arm64 package, which sets it (and CPPFLAGS'
+    # -mmacosx-version-min, and CMAKE_OSX_DEPLOYMENT_TARGET) unconditionally
+    # from its own version -- and which version gets installed is decided by
+    # c_stdlib_version, always a single value per config.  Dropping the key from
+    # the variant leaves the tiers distinguished by c_stdlib_version, which
+    # stays in the hash, so they still get distinct build strings on top of the
+    # distinct build numbers above.
+    ignore_keys:
+      - MACOSX_DEPLOYMENT_TARGET
 
 requirements:
   build:
@@ -52,14 +82,24 @@ tests:
   - files:
       source:
         - python/
+      recipe:
+        - run_tests.py
     requirements:
       run:
         - pip
         - numpy
+        # test_extension builds a setuptools extension; py3.12+ has none bundled
+        - setuptools
     script:
       - pip check
       - if: osx and arm64
-        then: python -m unittest discover python/tests
+        then:
+          # test_extension expects a user's environment: rattler-build exports
+          # its own MACOSX_DEPLOYMENT_TARGET default (11.0), which mlx.extension
+          # rejects, and the CI sets CMAKE_GENERATOR, which changes the build
+          # directory the tests assert on.
+          - unset MACOSX_DEPLOYMENT_TARGET CMAKE_GENERATOR
+          - python run_tests.py python/tests
 
 about:
   summary: An array framework for Apple silicon
