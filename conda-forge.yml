@@ -13,4 +13,16 @@ github:
   tooling_branch_name: main
 provider:
   linux_aarch64: default
+  # osx-arm64 moves off Azure so each SDK tier can pick its own runner image via
+  # github_actions_labels in recipe/conda_build_config.yaml.  The macOS 26 tier
+  # needs to build on a macOS 26 host: stdlib("c") pulls in
+  # macosx_deployment_target 26.0, whose strong run_exports puts `__osx >=26.0`
+  # into the *host* environment, which cannot be solved on Azure's macOS 15
+  # agents.  Azure only offers macOS 26 as an Intel-only public preview, whereas
+  # GitHub's macos-26 runner is arm64 and ships Xcode 26.x.
+  #
+  # Keyed on osx_64, not osx_arm64: conda-smithy resolves a target's CI provider
+  # through its *build* platform, and `build_platform` above cross-compiles
+  # osx_arm64 from osx_64, so the osx_arm64 key would never be consulted.
+  osx_64: github_actions
 test: native

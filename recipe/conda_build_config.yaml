@@ -1,4 +1,34 @@
-c_stdlib_version:          # [osx and arm64]
-  - "14.5"                 # [osx and arm64]
-MACOSX_SDK_VERSION:        # [osx and arm64]
-  - "14.5"                 # [osx and arm64]
+# osx-arm64 is built once per macOS SDK / deployment-target tier.  MLX gates
+# several features on the SDK it is compiled against -- most importantly the
+# M-series NAX (MetalPerformancePrimitives / Metal 4) attention, GEMM and
+# quantized kernels, which give a large SDPA and matmul speedup on capable
+# hardware -- but enabling them also raises the minimum macOS the package can
+# run on.  Building the tiers side by side lets users on older macOS keep a
+# working package while macOS 26 users get the faster one.
+#
+# The lowest tier is 14.5 rather than conda-forge's global default: MLX's
+# CMakeLists hard-errors with "MLX requires macOS >= 14.0", so the pinning
+# default of 11.0 cannot be built at all.
+c_stdlib_version:             # [osx and arm64]
+  - "14.5"                    # [osx and arm64]
+  - "26.0"                    # [osx and arm64]
+
+MACOSX_SDK_VERSION:           # [osx and arm64]
+  - "14.5"                    # [osx and arm64]
+  - "26.1"                    # [osx and arm64]
+
+github_actions_labels:        # [osx and arm64]
+  - macos-15                  # [osx and arm64]
+  - macos-26                  # [osx and arm64]
+
+zip_keys:                       # [osx and arm64]
+  -                             # [osx and arm64]
+    - c_stdlib_version          # [osx and arm64]
+    - MACOSX_SDK_VERSION        # [osx and arm64]
+    - github_actions_labels     # [osx and arm64]
+
+# Re-rendering leaves both tiers' values in every .ci_support/osx_arm64_* file's
+# MACOSX_DEPLOYMENT_TARGET; that is a conda-smithy bug, and recipe.yaml's
+# build.variant.ignore_keys makes it harmless.  Nothing here needs hand-editing
+# afterwards.
+
