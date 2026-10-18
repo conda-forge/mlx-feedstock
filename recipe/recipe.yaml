@@ -3,7 +3,7 @@ schema_version: 1
 context:
   name: mlx
   version: "0.32.4"
-  build_number: 0
+  build_number: 1
 
 package:
   name: ${{ name|lower }}
