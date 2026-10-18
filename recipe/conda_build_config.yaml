@@ -4,22 +4,32 @@
 # quantized kernels, which give a large SDPA and matmul speedup on capable
 # hardware -- but enabling them also raises the minimum macOS the package can
 # run on.  Building the tiers side by side lets users on older macOS keep a
-# working package while macOS 26 users get the faster one.
+# working package while macOS 26 and 27 users get the faster ones.
+#
+# Each tier above 14.5 builds against the newest stable SDK of its macOS major
+# and requires that same macOS at runtime, so code compiled against the newer
+# SDK can never land on a host older than it.  Neither 26.5 nor 27.0 has a
+# downloadable SDK, so conda-forge-ci-setup takes them from the runner's
+# installed Xcode: 26.5 from the macos-26 image, 27.0 from the xcode-27 image
+# (27.2 is still a beta there and is deliberately not used).
 #
 # The lowest tier is 14.5 rather than conda-forge's global default: MLX's
 # CMakeLists hard-errors with "MLX requires macOS >= 14.0", so the pinning
 # default of 11.0 cannot be built at all.
 c_stdlib_version:             # [osx and arm64]
   - "14.5"                    # [osx and arm64]
-  - "26.0"                    # [osx and arm64]
+  - "26.5"                    # [osx and arm64]
+  - "27.0"                    # [osx and arm64]
 
 MACOSX_SDK_VERSION:           # [osx and arm64]
   - "14.5"                    # [osx and arm64]
-  - "26.1"                    # [osx and arm64]
+  - "26.5"                    # [osx and arm64]
+  - "27.0"                    # [osx and arm64]
 
 github_actions_labels:        # [osx and arm64]
   - macos-15                  # [osx and arm64]
   - macos-26                  # [osx and arm64]
+  - xcode-27                  # [osx and arm64]
 
 zip_keys:                       # [osx and arm64]
   -                             # [osx and arm64]
