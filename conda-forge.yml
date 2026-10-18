@@ -7,7 +7,7 @@ conda_build:
   error_overlinking: true
 conda_forge_output_validation: true
 # TEST ONLY -- revert before merging.  osx-arm64 pulls the unreleased
-# conda-forge-ci-setup (conda-forge/conda-forge-ci-setup-feedstock#443) from the
+# conda-forge-ci-setup 4.30.0 (conda-forge/conda-forge-ci-setup-feedstock#443) from the
 # mark.harfouche channel via a hand edit of .scripts/run_osx_build.sh after
 # re-rendering (remote_ci_setup has no platform selectors and linux must keep
 # conda-forge's build).  pixi cannot express a channel there, hence conda
