@@ -42,3 +42,7 @@ zip_keys:                       # [osx and arm64]
 # build.variant.ignore_keys makes it harmless.  Nothing here needs hand-editing
 # afterwards.
 
+
+# TEST ONLY -- revert before merging, see conda-forge.yml.
+channel_sources:              # [osx and arm64]
+  - mark.harfouche,conda-forge  # [osx and arm64]
