@@ -24,7 +24,7 @@ build:
   # osx-arm64 is built once per macOS SDK tier (see conda_build_config.yaml).
   # Encoding the deployment target's major and minor version in the build
   # number makes the ordering between the tiers explicit -- 14.5 -> 140500,
-  # 26.5 -> 260500, 27.0 -> 270000, plus build_number -- so the newest tier a
+  # 26.0 -> 260000, 27.0 -> 270000, plus build_number -- so the newest tier a
   # host can actually run always wins the solve.  The minor version is needed
   # now that two tiers can share a major, and the result stays above the
   # major-only numbers (1400, 2600) used by earlier builds.

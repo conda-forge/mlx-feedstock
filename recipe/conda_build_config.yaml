@@ -7,8 +7,13 @@
 # working package while macOS 26 and 27 users get the faster ones.
 #
 # Each tier above 14.5 builds against the newest stable SDK of its macOS major
-# and requires that same macOS at runtime, so code compiled against the newer
-# SDK can never land on a host older than it.  Neither 26.5 nor 27.0 has a
+# and runs from the first release of that major (26.0, 27.0).  That is safe
+# because MLX guards everything newer at runtime: the NAX kernels only
+# dispatch when is_nax_available() sees macOS >= 26.2 (and capable hardware),
+# JACCL dlopen()s librdma and checks for macOS >= 26.3, and the Metal kernels
+# are compiled with -mmacosx-version-min set to the deployment target.  A
+# 26.0 floor also means the 26 tier needs no newer macosx_deployment_target
+# than conda-forge already publishes.  Neither 26.5 nor 27.0 has a
 # downloadable SDK, so conda-forge-ci-setup takes them from the runner's
 # installed Xcode: 26.5 from the macos-26 image, 27.0 from the xcode-27 image
 # (27.2 is still a beta there and is deliberately not used).
@@ -18,7 +23,7 @@
 # default of 11.0 cannot be built at all.
 c_stdlib_version:             # [osx and arm64]
   - "14.5"                    # [osx and arm64]
-  - "26.5"                    # [osx and arm64]
+  - "26.0"                    # [osx and arm64]
   - "27.0"                    # [osx and arm64]
 
 MACOSX_SDK_VERSION:           # [osx and arm64]
