@@ -31,7 +31,10 @@ build:
   number: ${{ ((c_stdlib_version | split(".") | first | int) * 100 + (c_stdlib_version | split(".") | last | int)) * 100 + build_number if osx else build_number }}
   # The old `match(python, "<3.9")` term is gone as redundant: conda-forge
   # builds nothing below 3.10 today, so it could never select anything.
-  skip: win or (osx and x86_64)
+  # TEST ONLY -- revert before merging: `or match(python, "<3.14") or
+  # match(python, ">=3.15")` builds only Python 3.14 to keep CI short while
+  # iterating on the SDK tiers.
+  skip: win or (osx and x86_64) or match(python, "<3.14") or match(python, ">=3.15")
   variant:
     # conda-smithy writes *both* tiers' deployment targets into *every*
     # .ci_support/osx_arm64_* file, because it derives MACOSX_DEPLOYMENT_TARGET
