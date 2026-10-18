@@ -10,8 +10,9 @@ conda_forge_output_validation: true
 # conda-forge-ci-setup (conda-forge/conda-forge-ci-setup-feedstock#443) from the
 # mark.harfouche channel via a hand edit of .scripts/run_osx_build.sh after
 # re-rendering (remote_ci_setup has no platform selectors and linux must keep
-# conda-forge's build).  pixi cannot express a channel there, hence mamba.
-conda_install_tool: mamba
+# conda-forge's build).  pixi cannot express a channel there, hence conda
+# (mamba 2.x rejects the --update-specs flag the generated scripts pass).
+conda_install_tool: conda
 conda_build_tool: rattler-build
 github:
   branch_name: main
