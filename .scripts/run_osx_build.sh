@@ -56,8 +56,8 @@ export CONDA_SOLVER="libmamba"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 # Provision the necessary dependencies to build the recipe later
 echo Installing dependencies
-conda install --update-specs --yes --quiet --channel conda-forge --strict-channel-priority \
-    pip conda conda-libmamba-solver rattler-build conda-forge-ci-setup=4 "conda-build>=26.3"
+conda install --update-specs --yes --quiet --channel mark.harfouche --channel conda-forge --strict-channel-priority \
+    pip conda conda-libmamba-solver rattler-build mark.harfouche::conda-forge-ci-setup=4.30.0 "conda-build>=26.3"  # TEST ONLY, hand-edited
 
 
 
