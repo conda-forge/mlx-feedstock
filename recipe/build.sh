@@ -58,6 +58,23 @@ if [[ "${target_platform}" == "osx-arm64" ]]; then
     echo "Selected Xcode at ${DEVELOPER_DIR} (macOS ${best_sdk} SDK) for the macOS ${wanted_sdk} tier"
   fi
 
+  # Since Xcode 26 the Metal toolchain is a separate download, and some runner
+  # images (e.g. GitHub's xcode-27) ship Xcode without it, failing every
+  # `xcrun metal` with "missing Metal Toolchain".  Fetch it when absent.  The
+  # toolchain is mounted in the background once the download finishes, so
+  # `xcrun metal` can still fail right after `-downloadComponent` returns;
+  # give it a moment rather than failing the build.
+  if ! xcrun -sdk macosx metal --version >/dev/null 2>&1; then
+    echo "Metal toolchain missing for ${DEVELOPER_DIR}; downloading it"
+    /usr/bin/xcodebuild -downloadComponent MetalToolchain
+    for _ in $(seq 1 30); do
+      xcrun -sdk macosx metal --version >/dev/null 2>&1 && break
+      sleep 2
+    done
+    /usr/bin/xcodebuild -showComponent metalToolchain || true
+    xcrun -sdk macosx metal --version
+  fi
+
   # The M-series NAX (MetalPerformancePrimitives / Metal 4) kernels are built
   # when the Metal toolchain's SDK is >= 26.2 and the deployment target is
   # >= 26.0 -- the same gate recipe/0002-*.patch leaves in CMake.  The 26.2 SDK

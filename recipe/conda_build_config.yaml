@@ -4,7 +4,19 @@
 # quantized kernels, which give a large SDPA and matmul speedup on capable
 # hardware -- but enabling them also raises the minimum macOS the package can
 # run on.  Building the tiers side by side lets users on older macOS keep a
-# working package while macOS 26 users get the faster one.
+# working package while macOS 26 and 27 users get the faster ones.
+#
+# Each tier above 14.5 builds against the newest stable SDK of its macOS major
+# and runs from the first release of that major (26.0, 27.0).  That is safe
+# because MLX guards everything newer at runtime: the NAX kernels only
+# dispatch when is_nax_available() sees macOS >= 26.2 (and capable hardware),
+# JACCL dlopen()s librdma and checks for macOS >= 26.3, and the Metal kernels
+# are compiled with -mmacosx-version-min set to the deployment target.  A
+# 26.0 floor also means the 26 tier needs no newer macosx_deployment_target
+# than conda-forge already publishes.  Neither 26.5 nor 27.0 has a
+# downloadable SDK, so conda-forge-ci-setup takes them from the runner's
+# installed Xcode: 26.5 from the macos-26 image, 27.0 from the xcode-27 image
+# (27.2 is still a beta there and is deliberately not used).
 #
 # The lowest tier is 14.5 rather than conda-forge's global default: MLX's
 # CMakeLists hard-errors with "MLX requires macOS >= 14.0", so the pinning
@@ -12,14 +24,17 @@
 c_stdlib_version:             # [osx and arm64]
   - "14.5"                    # [osx and arm64]
   - "26.0"                    # [osx and arm64]
+  - "27.0"                    # [osx and arm64]
 
 MACOSX_SDK_VERSION:           # [osx and arm64]
   - "14.5"                    # [osx and arm64]
-  - "26.1"                    # [osx and arm64]
+  - "26.5"                    # [osx and arm64]
+  - "27.0"                    # [osx and arm64]
 
 github_actions_labels:        # [osx and arm64]
   - macos-15                  # [osx and arm64]
   - macos-26                  # [osx and arm64]
+  - xcode-27                  # [osx and arm64]
 
 zip_keys:                       # [osx and arm64]
   -                             # [osx and arm64]
@@ -32,3 +47,7 @@ zip_keys:                       # [osx and arm64]
 # build.variant.ignore_keys makes it harmless.  Nothing here needs hand-editing
 # afterwards.
 
+
+# TEST ONLY -- revert before merging, see conda-forge.yml.
+channel_sources:              # [osx and arm64]
+  - mark.harfouche,conda-forge  # [osx and arm64]

@@ -3,7 +3,7 @@ schema_version: 1
 context:
   name: mlx
   version: "0.32.4"
-  build_number: 1
+  build_number: 2
 
 package:
   name: ${{ name|lower }}
@@ -22,13 +22,19 @@ source:
 
 build:
   # osx-arm64 is built once per macOS SDK tier (see conda_build_config.yaml).
-  # Encoding the deployment target's major version in the build number makes
-  # the ordering between the tiers explicit -- 14.5 -> 1400, 26.0 -> 2600 --
-  # so the newest tier a host can actually run always wins the solve.
-  number: ${{ (c_stdlib_version | split(".") | first | int) * 100 + build_number if osx else build_number }}
+  # Encoding the deployment target's major and minor version in the build
+  # number makes the ordering between the tiers explicit -- 14.5 -> 140500,
+  # 26.0 -> 260000, 27.0 -> 270000, plus build_number -- so the newest tier a
+  # host can actually run always wins the solve.  The minor version is needed
+  # now that two tiers can share a major, and the result stays above the
+  # major-only numbers (1400, 2600) used by earlier builds.
+  number: ${{ ((c_stdlib_version | split(".") | first | int) * 100 + (c_stdlib_version | split(".") | last | int)) * 100 + build_number if osx else build_number }}
   # The old `match(python, "<3.9")` term is gone as redundant: conda-forge
   # builds nothing below 3.10 today, so it could never select anything.
-  skip: win or (osx and x86_64)
+  # TEST ONLY -- revert before merging: `or match(python, "<3.14") or
+  # match(python, ">=3.15")` builds only Python 3.14 to keep CI short while
+  # iterating on the SDK tiers.
+  skip: win or (osx and x86_64) or match(python, "<3.14") or match(python, ">=3.15")
   variant:
     # conda-smithy writes *both* tiers' deployment targets into *every*
     # .ci_support/osx_arm64_* file, because it derives MACOSX_DEPLOYMENT_TARGET
