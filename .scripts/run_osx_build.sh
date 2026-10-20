@@ -32,33 +32,32 @@ if [[ "${arch}" == "x86_64" ]]; then
   arch="64"
 fi
 
-( startgroup "Provisioning base env with pixi" ) 2> /dev/null
+( startgroup "Installing a fresh version of Miniforge" ) 2> /dev/null
 
-echo Installing pixi
-curl -fsSL https://pixi.sh/install.sh | bash
-export PATH="~/.pixi/bin:$PATH"
+echo Downloading Miniforge
+MINIFORGE_URL="https://github.com/conda-forge/miniforge/releases/latest/download"
+MINIFORGE_FILE="Miniforge3-MacOSX-$(uname -m).sh"
+curl -L -O "${MINIFORGE_URL}/${MINIFORGE_FILE}"
 
-pushd "${FEEDSTOCK_ROOT}"
-echo Installing environment
-mkdir -p "${MINIFORGE_HOME}"
-PIXI_ENV=build
-sed -i.bak "s/platforms = .*/platforms = [\"osx-${arch}\"]/" pixi.toml
-pixi install --environment "${PIXI_ENV}"
-pixi list --environment "${PIXI_ENV}"
+echo Installing Miniforge
+rm -rf "${MINIFORGE_HOME}"
+bash "${MINIFORGE_FILE}" -b -p "${MINIFORGE_HOME}"
 
-echo Activating environment
-eval "$(pixi shell-hook --environment "${PIXI_ENV}")"
-mv pixi.toml.bak pixi.toml
-popd
-
-( endgroup "Provisioning base env with pixi" ) 2> /dev/null
+( endgroup "Installing a fresh version of Miniforge" ) 2> /dev/null
 
 ( startgroup "Configuring conda" ) 2> /dev/null
 
 # Activate the base conda environment
+echo Activating environment
+source "${MINIFORGE_HOME}/etc/profile.d/conda.sh"
+conda activate base
 # Configure the solver
 export CONDA_SOLVER="libmamba"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
+# Provision the necessary dependencies to build the recipe later
+echo Installing dependencies
+conda install --update-specs --yes --quiet --channel conda-forge --strict-channel-priority \
+    pip conda conda-libmamba-solver rattler-build conda-forge-ci-setup=4 "conda-build>=26.3"
 
 
 
@@ -105,6 +104,11 @@ fi
 echo Running build setup
 source run_conda_forge_build_setup
 
+
+
+if [[ "${HOST_PLATFORM}" != "${BUILD_PLATFORM}" ]] && [[ "${BUILD_WITH_CONDA_DEBUG:-0}" != 1 ]]; then
+    EXTRA_CB_OPTIONS="${EXTRA_CB_OPTIONS:-} --test skip"
+fi
 
 
 ( endgroup "Configuring conda" ) 2> /dev/null

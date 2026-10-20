@@ -41,28 +41,12 @@ CONDARC
 
 ( endgroup "Configuring build environment" ) 2> /dev/null
 
-( startgroup "Provisioning base env with pixi" ) 2> /dev/null
-
-pushd "${FEEDSTOCK_ROOT}"
-echo Installing environment
-arch=$(uname -m)
-if [[ "$arch" == "x86_64" ]]; then
-  arch="64"
-fi
-PIXI_ENV=docker-build-linux-${arch}
-sed -i.bak -e "s/platforms = .*/platforms = [\"linux-${arch}\"]/" -e "s/# __PLATFORM_SPECIFIC_ENV__ =/${PIXI_ENV} =/" pixi.toml
-pixi install --environment "${PIXI_ENV}"
-pixi list --environment "${PIXI_ENV}"
-
-echo Activating environment
-eval "$(pixi shell-hook --environment "${PIXI_ENV}")"
-mv pixi.toml.bak pixi.toml
-popd
-
-( endgroup "Provisioning base env with pixi" ) 2> /dev/null
-
 ( startgroup "Configuring conda" ) 2> /dev/null
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
+# Provision the necessary dependencies to build the recipe later
+echo Installing dependencies
+conda install --update-specs --yes --quiet --channel conda-forge --strict-channel-priority \
+    pip conda conda-libmamba-solver rattler-build conda-forge-ci-setup=4 "conda-build>=26.3"
 
 
 
