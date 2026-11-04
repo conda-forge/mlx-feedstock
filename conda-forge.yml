@@ -11,6 +11,11 @@ conda_install_tool: pixi
 github:
   branch_name: main
   tooling_branch_name: main
+# 4.32 is the first to download the macOS 26.5 SDK. Without a floor, pixi picks
+# Python 3.10, which 4.32 is not built for, and an older ci-setup with it.
+remote_ci_setup:
+  - conda-forge-ci-setup>=4.32
+  - conda-build>=26.3
 provider:
   linux_aarch64: default
   osx_64: github_actions
