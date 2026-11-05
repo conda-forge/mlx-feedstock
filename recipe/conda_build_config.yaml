@@ -13,9 +13,13 @@ c_stdlib_version:             # [osx and arm64]
   - "14.5"                    # [osx and arm64]
   - "26.0"                    # [osx and arm64]
 
+# The macOS 26 tier builds C++ against the 26.5 SDK, which conda-forge-ci-setup
+# downloads. MLX compiles its Metal kernels with `xcrun -sdk macosx metal`, which
+# uses the runner's Xcode SDK instead (26.5 on macos-26), and the NAX kernels
+# need 26.2 or newer there; the recipe tests check that they are in the package.
 MACOSX_SDK_VERSION:           # [osx and arm64]
   - "14.5"                    # [osx and arm64]
-  - "26.1"                    # [osx and arm64]
+  - "26.5"                    # [osx and arm64]
 
 github_actions_labels:        # [osx and arm64]
   - macos-15                  # [osx and arm64]
