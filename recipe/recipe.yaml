@@ -3,7 +3,7 @@ schema_version: 1
 context:
   name: mlx
   version: "0.32.4"
-  build_number: 2
+  build_number: 3
 
 package:
   name: ${{ name|lower }}
@@ -13,11 +13,10 @@ source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v${{ version }}.tar.gz
   sha256: 0276db8d7bf1af8db6d4ae25c7c550abea4d5b3b6a16207610a5d4a0c19fe1a0
-  # Applied unconditionally: both touch only code inside `if(MLX_BUILD_METAL)`
+  # Applied unconditionally: it touches only code inside `if(MLX_BUILD_METAL)`
   # and the Metal-only backend, which is compiled out everywhere but macOS, so
-  # neither needs a platform selector to be safe.
+  # it needs no platform selector to be safe.
   patches:
-    - 0001-Gate-each-SDK-feature-on-the-SDK-that-supplies-its-h.patch
     - 0002-Never-JIT-for-a-newer-Metal-version-than-the-build-t.patch
 
 build:
@@ -101,7 +100,7 @@ tests:
           - unset MACOSX_DEPLOYMENT_TARGET CMAKE_GENERATOR
           - python run_tests.py python/tests
       # the macOS 26 tier exists to ship the NAX (Metal 4) kernels
-      - if: osx and arm64 and c_stdlib_version == "26.0"
+      - if: osx and arm64 and c_stdlib_version == "26.2"
         then:
           - grep -q steel_gemm_fused_nax $PREFIX/lib/mlx.metallib
 
