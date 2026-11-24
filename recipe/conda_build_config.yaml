@@ -11,7 +11,7 @@
 # default of 11.0 cannot be built at all.
 c_stdlib_version:             # [osx and arm64]
   - "14.5"                    # [osx and arm64]
-  - "26.0"                    # [osx and arm64]
+  - "26.2"                    # [osx and arm64]
 
 # The macOS 26 tier builds C++ against the 26.5 SDK, which conda-forge-ci-setup
 # downloads. MLX compiles its Metal kernels with `xcrun -sdk macosx metal`, which
