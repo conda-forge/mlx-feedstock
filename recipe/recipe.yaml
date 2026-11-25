@@ -2,8 +2,8 @@ schema_version: 1
 
 context:
   name: mlx
-  version: "0.32.4"
-  build_number: 2
+  version: "0.32.5"
+  build_number: 0
 
 package:
   name: ${{ name|lower }}
@@ -12,7 +12,7 @@ package:
 source:
   # There are no sources on PyPI
   url: https://github.com/ml-explore/mlx/archive/v${{ version }}.tar.gz
-  sha256: 0276db8d7bf1af8db6d4ae25c7c550abea4d5b3b6a16207610a5d4a0c19fe1a0
+  sha256: b318f8763a31c9eb66b38e378ae2655e6c9874a51d1ef03aa7c4de4ab977c5af
   # Applied unconditionally: both touch only code inside `if(MLX_BUILD_METAL)`
   # and the Metal-only backend, which is compiled out everywhere but macOS, so
   # neither needs a platform selector to be safe.
